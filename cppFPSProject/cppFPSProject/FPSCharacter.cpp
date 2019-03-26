@@ -1,7 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "FPSCharacter.h"
+#include "Engine/Engine.h"
 
+#include "GameFramework/Controller.h"
+#include "Components/InputComponent.h"
 
 // Sets default values
 AFPSCharacter::AFPSCharacter()
@@ -16,6 +19,9 @@ void AFPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// // 显示调试信息五秒。-1“键”值（首个参数）说明我们无需更新或刷新此消息。
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("We are using FPSCharacter"));
+
 }
 
 // Called every frame
@@ -30,5 +36,19 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAxis("MoveForward", this, &AFPSCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &AFPSCharacter::MoveRight);
+}
+
+void AFPSCharacter::MoveForward(float value)
+{
+	FVector dir = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::X);
+	AddMovementInput(dir, value);
+}
+
+void AFPSCharacter::MoveRight(float value)
+{
+	FVector dir = FRotationMatrix(Controller->GetControlRotation()).GetScaledAxis(EAxis::Y);
+	AddMovementInput(dir, value);
 }
 
