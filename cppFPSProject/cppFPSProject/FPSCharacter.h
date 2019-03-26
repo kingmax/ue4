@@ -31,5 +31,11 @@ public:
 
 	UFUNCTION()
 		void MoveRight(float value);
+
+	UFUNCTION()
+		void StartJump();
+
+	UFUNCTION()
+		void StopJump();
 	
 };
