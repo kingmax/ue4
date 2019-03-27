@@ -2,6 +2,22 @@
 
 #include "FPSHUD.h"
 
+void AFPSHUD::DrawHUD()
+{
+	Super::DrawHUD();
 
+	if (CrosshairTexture)
+	{
+		// 画布中心
+		FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
 
+		// 纹理维度进行一半偏移，使纹理中心和画布中心对齐。
+		FVector2D CrosshairDrawPosition(Center.X - (CrosshairTexture->GetSurfaceWidth() * 0.5f),
+			Center.Y - (CrosshairTexture->GetSurfaceWidth() * 0.5f));
 
+		// 在中心点绘制准星。
+		FCanvasTileItem TileItem(CrosshairDrawPosition, CrosshairTexture->Resource, FLinearColor::White);
+		TileItem.BlendMode = SE_BLEND_Translucent;
+		Canvas->DrawItem(TileItem);
+	}
+}
