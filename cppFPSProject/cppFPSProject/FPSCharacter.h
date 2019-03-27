@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Camera/CameraComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
@@ -42,4 +43,18 @@ public:
 	
 	UPROPERTY(VisibleAnywhere)
 		UCameraComponent* FPSCameraComponent;
+
+	// 第一人称模型（手臂），仅对拥有玩家可见。
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		USkeletalMeshComponent* FPSMesh;
+
+	UFUNCTION()
+		void Fire();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GamePlay)
+		FVector MuzzleOffset;
+
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+		TSubclassOf<class AFPSProjectile> ProjectileClass;
+
 };

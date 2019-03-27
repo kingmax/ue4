@@ -18,6 +18,16 @@ AFPSCharacter::AFPSCharacter()
 	FPSCameraComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f + BaseEyeHeight));
 	// 用 pawn 控制摄像机旋转。
 	FPSCameraComponent->bUsePawnControlRotation = true;
+
+	// 为拥有玩家创建一个第一人称模型组件
+	FPSMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirstPersonMesh"));
+	FPSMesh->SetOnlyOwnerSee(true);
+	FPSMesh->SetupAttachment(FPSCameraComponent);
+	FPSMesh->bCastDynamicShadow = false;
+	FPSMesh->CastShadow = false;
+
+	// 拥有玩家无法看到普通（第三人称）身体模型。
+	GetMesh()->SetOwnerNoSee(true);
 }
 
 // Called when the game starts or when spawned
@@ -50,6 +60,8 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AFPSCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AFPSCharacter::StopJump);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AFPSCharacter::Fire);
 }
 
 void AFPSCharacter::MoveForward(float value)
@@ -72,5 +84,9 @@ void AFPSCharacter::StartJump()
 void AFPSCharacter::StopJump()
 {
 	bPressedJump = false;
+}
+
+void AFPSCharacter::Fire()
+{
 }
 
