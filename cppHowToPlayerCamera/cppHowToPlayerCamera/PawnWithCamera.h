@@ -4,6 +4,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Components/InputComponent.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
@@ -34,4 +35,15 @@ protected:
 	USpringArmComponent* OurCameraSpringArm;
 	UCameraComponent* OurCamera;
 	
+	FVector2D MovementInput;
+	FVector2D CameraInput;
+	float ZoomFactor;
+	bool bZoomingIn;
+
+	void MoveForward(float AxisValue);
+	void MoveRight(float AxisValue);
+	void PitchCamera(float AxisValue);
+	void YawCamera(float AxisValue);
+	void ZoomIn();
+	void ZoomOut();
 };
