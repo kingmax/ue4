@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "CollidingPawn.h"
-
+#include "Components/InputComponent.h"
 
 // Sets default values
 ACollidingPawn::ACollidingPawn()
@@ -17,7 +17,10 @@ ACollidingPawn::ACollidingPawn()
 	UStaticMeshComponent* SphereVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
 	SphereVisual->SetupAttachment(RootComponent);
 	// http://api.unrealengine.com/CHN/Programming/Tutorials/Components/1/index.html
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
+
+	//Error, ref: https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1342624-cdo-constructor-failed-to-find-thirdperson-c-template-mannequin-animbp
+	//static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("Game/StarterContent/Shapes/Shape_Sphere"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
 	if (SphereVisualAsset.Succeeded())
 	{
 		SphereVisual->SetStaticMesh(SphereVisualAsset.Object);
@@ -29,7 +32,9 @@ ACollidingPawn::ACollidingPawn()
 	OurParticleSystem->AttachTo(SphereVisual);
 	OurParticleSystem->bAutoActivate = false;
 	OurParticleSystem->SetRelativeLocation(FVector(-20.0f, 0.0f, 20.0f));
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("Game/StarterContent/Particles/P_Fire.P_Fire"));
+	//ref: https://forums.unrealengine.com/development-discussion/c-gameplay-programming/1342624-cdo-constructor-failed-to-find-thirdperson-c-template-mannequin-animbp
+	//static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("Game/StarterContent/Particles/P_Fire"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Game/StarterContent/Particles/P_Fire.P_Fire"));
 	if (ParticleAsset.Succeeded())
 	{
 		OurParticleSystem->SetTemplate(ParticleAsset.Object);
@@ -46,6 +51,9 @@ ACollidingPawn::ACollidingPawn()
 	Camera->AttachTo(SpringArm, USpringArmComponent::SocketName);
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+	OurMovementComponent = CreateDefaultSubobject<UCollidingPawnMovementComponent>(TEXT("CustomMovementComponent"));
+	OurMovementComponent->UpdatedComponent = RootComponent;
 }
 
 // Called when the game starts or when spawned
@@ -67,5 +75,45 @@ void ACollidingPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	PlayerInputComponent->BindAction("ParticleToggle", IE_Pressed, this, &ACollidingPawn::ParticleToggle);
+	PlayerInputComponent->BindAxis("MoveForward", this, &ACollidingPawn::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ACollidingPawn::MoveRight);
+	PlayerInputComponent->BindAxis("Turn", this, &ACollidingPawn::Turn);
+}
+
+UPawnMovementComponent * ACollidingPawn::GetMovementComponent() const
+{
+	return OurMovementComponent;
+}
+
+void ACollidingPawn::MoveForward(float AxisValue)
+{
+	if (OurMovementComponent && (OurMovementComponent->UpdatedComponent == RootComponent))
+	{
+		OurMovementComponent->AddInputVector(GetActorForwardVector() * AxisValue);
+	}
+}
+
+void ACollidingPawn::MoveRight(float AxisValue)
+{
+	if (OurMovementComponent && (OurMovementComponent->UpdatedComponent == RootComponent))
+	{
+		OurMovementComponent->AddInputVector(GetActorRightVector() * AxisValue);
+	}
+}
+
+void ACollidingPawn::Turn(float AxisValue)
+{
+	FRotator newRotation = GetActorRotation();
+	newRotation.Yaw += AxisValue;
+	SetActorRotation(newRotation);
+}
+
+void ACollidingPawn::ParticleToggle()
+{
+	if (OurParticleSystem && OurParticleSystem->Template)
+	{
+		OurParticleSystem->ToggleActive();
+	}
 }
 

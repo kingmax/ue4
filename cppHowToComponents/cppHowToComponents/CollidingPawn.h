@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "ConstructorHelpers.h"
+#include "CollidingPawnMovementComponent.h"
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
@@ -35,4 +36,13 @@ public:
 
 	UParticleSystemComponent* OurParticleSystem;
 	
+	//class UCollidingPawnMovementComponent* OurMovementComponent;
+	UCollidingPawnMovementComponent* OurMovementComponent;
+
+	virtual UPawnMovementComponent* GetMovementComponent() const override;
+
+	void MoveForward(float AxisValue);
+	void MoveRight(float AxisValue);
+	void Turn(float AxisValue);
+	void ParticleToggle();
 };
